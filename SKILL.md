@@ -13,8 +13,8 @@ metadata:
 
 Use this skill for read-only currency conversion and exchange-rate lookup. It supports multiple free sources:
 
-- `auto` / `fast` (default): try `fxapi.app`, then `MoneyConvert`, then Frankfurter / ECB as fallback.
-- `fxapi`: no-key fast source, advertised 5-minute updates, direct pair endpoint.
+- `auto` / `fast` (default): use `fxapi.app` as the primary source, then `MoneyConvert`, then Frankfurter / ECB as fallback.
+- `fxapi`: primary no-key fast source, advertised 5-minute updates, direct pair endpoint.
 - `moneyconvert`: no-key fast fallback, advertised 5-minute updates, USD-based all-rates endpoint.
 - `ecb`: Frankfurter API backed by European Central Bank daily reference rates.
 
@@ -40,7 +40,7 @@ python3 scripts/convert.py 100 USD CNY
 ## Workflow
 1. Normalize currency codes to 3-letter uppercase codes such as `USD`, `EUR`, `CNY`, `JPY`, `GBP`, or `HKD`.
 2. Choose the source:
-   - Use default `auto` for a fast no-key answer.
+   - Use default `auto` for a fast no-key answer; it should normally resolve through `fxapi.app` first.
    - Use `--source ecb` when the user asks for official ECB / daily reference rates.
    - Use `--source fxapi` or `--source moneyconvert` when testing a specific fast source.
 3. Run `python3 scripts/convert.py <amount> <from_currency> <to_currency> [--source SOURCE]` from the skill root.
@@ -74,7 +74,7 @@ python3 scripts/convert.py 0 EUR GBP
 ```
 
 ## Source notes
-- `fxapi.app`: no API key, CORS-enabled JSON, advertised 5-minute updates. Good default for quick free lookups, but not a long-established institutional data provider.
+- `fxapi.app`: primary source for this skill. No API key, CORS-enabled JSON, advertised 5-minute updates. Good default for quick free lookups, but not a long-established institutional data provider.
 - `MoneyConvert`: no authentication, CDN JSON API, advertised 5-minute updates, attribution/terms apply. Good fallback for fast no-key lookup.
 - `Frankfurter / ECB`: no API key, official-style daily ECB reference data, strongest for accounting/reference context, but not real-time and covers fewer currencies.
 - Same-currency and zero-amount conversion are handled locally without an API request.

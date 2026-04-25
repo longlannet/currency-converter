@@ -1,6 +1,6 @@
 # currency-converter
 
-面向 OpenClaw 的多源汇率换算 skill。默认使用免费、无 API key、更新较快的参考汇率源，并保留 Frankfurter / ECB 每日官方参考汇率模式。
+面向 OpenClaw 的多源汇率换算 skill。默认以 `fxapi.app` 作为主源，使用免费、无 API key、更新较快的参考汇率，并保留 MoneyConvert fallback 与 Frankfurter / ECB 每日官方参考汇率模式。
 
 > 所有输出都只是参考汇率，不是交易级报价，也不构成财务建议。
 
@@ -16,8 +16,8 @@
 
 | Source | 命令参数 | 更新频率 | API key | 说明 |
 | --- | --- | --- | --- | --- |
-| 自动快速源 | `--source auto` / 默认 | 优先 5 分钟级，失败后 fallback | 不需要 | fxapi.app → MoneyConvert → ECB |
-| fxapi.app | `--source fxapi` | 标称 5 分钟 | 不需要 | 接入简单，适合快速查询 |
+| 自动快速源 | `--source auto` / 默认 | 优先 5 分钟级，失败后 fallback | 不需要 | fxapi.app 主源 → MoneyConvert → ECB |
+| fxapi.app | `--source fxapi` | 标称 5 分钟 | 不需要 | 主源，接入简单，适合快速查询 |
 | MoneyConvert | `--source moneyconvert` | 标称 5 分钟 | 不需要 | CDN JSON，作为备用快速源 |
 | Frankfurter / ECB | `--source ecb` | ECB 工作日每日更新 | 不需要 | 官方参考属性强，但非实时 |
 
@@ -75,6 +75,7 @@ python3 scripts/convert.py 0 EUR GBP
 ## 注意
 
 - 默认快速源不是官方央行报价，也不是交易级报价。
+- 默认以后以 `fxapi.app` 为主源；`MoneyConvert` 只作为快速备用源。
 - `fxapi.app` 与 `MoneyConvert` 标称 5 分钟更新，但长期稳定性和数据源透明度不如老牌付费/官方数据源。
 - `Frankfurter / ECB` 是每日参考汇率，周末或节假日通常返回最近一个工作日的汇率日期。
 - 如果需要生产级、审计级或交易级数据，应接入更成熟的付费源或官方授权数据源。
