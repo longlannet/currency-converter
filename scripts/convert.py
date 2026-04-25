@@ -97,6 +97,17 @@ def main() -> None:
         )
         return
 
+    if amount == 0:
+        print_result(
+            amount=amount,
+            base=base,
+            target=target,
+            result=0,
+            rate_date="N/A",
+            note="zero amount; converted locally without API request",
+        )
+        return
+
     data = fetch_conversion(amount, base, target)
     rate_date = data.get("date", "Unknown")
     rates = data.get("rates", {})

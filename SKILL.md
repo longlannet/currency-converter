@@ -56,6 +56,6 @@ python3 scripts/convert.py 100 USD USD
 - This skill is read-only and requires no API key.
 - It does not perform trading, payments, account access, or financial advice.
 - Frankfurter rates are ECB reference rates and update on ECB business days.
-- Same-currency conversion is handled locally (`100 USD` → `100 USD`) without an API request.
+- Same-currency and zero-amount conversion are handled locally without an API request.
 - If setup is missing or stale, re-run `bash scripts/install.sh`.
 - Keep detailed human-facing usage in `README.md`.
