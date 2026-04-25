@@ -1,10 +1,10 @@
 # currency-converter
 
-面向 OpenClaw 的 Frankfurter 汇率换算 skill，数据来自 European Central Bank (ECB)。
+面向 OpenClaw 的 Frankfurter 汇率换算 skill，数据来自 European Central Bank (ECB) 每日参考汇率。它不是实时/交易级汇率工具。
 
 ## 它能做什么
 
-- 按每日可用 ECB 参考汇率换算货币
+- 按每日可用 ECB 参考汇率换算货币（非实时行情）
 - 支持常见币种，如 USD、EUR、CNY、JPY、GBP、HKD 等
 - 无需 API key
 - 保持只读：不做交易、下单、账户访问或财务建议
@@ -47,8 +47,10 @@ python3 scripts/convert.py 100 USD USD
 - 查询时间
 - 数据来源 Frankfurter API
 
+注意：输出汇率是 ECB 每日参考汇率，不是实时市场报价，也不适合交易定价。
+
 ## 说明
 
-- Frankfurter 使用 ECB 参考汇率，周末或节假日通常返回最近一个工作日的汇率日期。
+- Frankfurter 使用 ECB 每日参考汇率，不是实时汇率；周末或节假日通常返回最近一个工作日的汇率日期。
 - 同币种和零金额换算会在本地直接返回，不请求 API。
 - 如果环境缺失或状态异常，重新运行 `scripts/install.sh`。
