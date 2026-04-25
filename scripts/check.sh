@@ -18,19 +18,41 @@ log "converter script: OK ($CONVERT_SCRIPT)"
 
 log "checking help output"
 python3 "$CONVERT_SCRIPT" --help >/tmp/currency-converter-help.txt || fail "help check failed"
+grep -q -- "--source" /tmp/currency-converter-help.txt || fail "help output missing --source"
 log "help check: OK"
 
 if [ "$RUN_SMOKE" = "1" ]; then
-  log "running smoke test: 1 EUR to USD"
-  python3 "$CONVERT_SCRIPT" 1 EUR USD >/tmp/currency-converter-smoke.txt || fail "smoke test failed"
-  grep -q "EUR" /tmp/currency-converter-smoke.txt || fail "smoke output missing source currency"
-  grep -q "USD" /tmp/currency-converter-smoke.txt || fail "smoke output missing target currency"
-  log "smoke test: OK"
+  log "running auto-source smoke test: 1 USD to CNY"
+  python3 "$CONVERT_SCRIPT" 1 USD CNY >/tmp/currency-converter-auto.txt || fail "auto-source smoke test failed"
+  grep -q "USD" /tmp/currency-converter-auto.txt || fail "auto-source output missing source currency"
+  grep -q "CNY" /tmp/currency-converter-auto.txt || fail "auto-source output missing target currency"
+  grep -q "数据来源" /tmp/currency-converter-auto.txt || fail "auto-source output missing provider"
+  log "auto-source smoke test: OK"
+
+  log "running explicit fxapi smoke test: 1 USD to CNY"
+  python3 "$CONVERT_SCRIPT" 1 USD CNY --source fxapi >/tmp/currency-converter-fxapi.txt || fail "fxapi smoke test failed"
+  grep -q "fxapi" /tmp/currency-converter-fxapi.txt || fail "fxapi output missing source marker"
+  log "fxapi smoke test: OK"
+
+  log "running explicit moneyconvert smoke test: 1 USD to CNY"
+  python3 "$CONVERT_SCRIPT" 1 USD CNY --source moneyconvert >/tmp/currency-converter-moneyconvert.txt || fail "moneyconvert smoke test failed"
+  grep -q "moneyconvert" /tmp/currency-converter-moneyconvert.txt || fail "moneyconvert output missing source marker"
+  log "moneyconvert smoke test: OK"
+
+  log "running explicit ecb smoke test: 1 EUR to USD"
+  python3 "$CONVERT_SCRIPT" 1 EUR USD --source ecb >/tmp/currency-converter-ecb.txt || fail "ecb smoke test failed"
+  grep -q "ECB" /tmp/currency-converter-ecb.txt || fail "ecb output missing ECB marker"
+  log "ecb smoke test: OK"
 
   log "running local same-currency test: 1 USD to USD"
   python3 "$CONVERT_SCRIPT" 1 USD USD >/tmp/currency-converter-same.txt || fail "same-currency test failed"
   grep -q "same currency" /tmp/currency-converter-same.txt || fail "same-currency output missing local marker"
   log "same-currency test: OK"
+
+  log "running local zero-amount test: 0 EUR to GBP"
+  python3 "$CONVERT_SCRIPT" 0 EUR GBP >/tmp/currency-converter-zero.txt || fail "zero-amount test failed"
+  grep -q "zero amount" /tmp/currency-converter-zero.txt || fail "zero-amount output missing local marker"
+  log "zero-amount test: OK"
 fi
 
 log "check complete"

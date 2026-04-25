@@ -1,8 +1,8 @@
 ---
 name: currency-converter
-description: Frankfurter API / 欧洲央行 ECB 每日参考汇率查询与货币换算（非实时/非交易级汇率）。Use when the task involves reference currency conversion, daily exchange rates, FX lookup, or converting amounts between currencies such as USD, EUR, CNY, JPY, GBP, HKD, and others.
+description: Multi-source currency conversion and exchange-rate lookup. Uses fast no-key sources such as fxapi.app and MoneyConvert for frequently updated reference rates, with Frankfurter / ECB daily reference rates available via --source ecb. Use when the task involves currency conversion, exchange rates, FX lookup, USD/CNY or other fiat pairs, or comparing fast free rates versus official ECB daily reference rates. Rates are informational, not trading-grade.
 metadata:
-  homepage: https://www.frankfurter.app/
+  homepage: https://github.com/longlannet/currency-converter
   openclaw:
     emoji: "💱"
     requires:
@@ -11,14 +11,22 @@ metadata:
 
 # Currency Converter
 
-Use this skill for read-only currency conversion and exchange-rate lookup using Frankfurter API data sourced from the European Central Bank (ECB). These are daily reference rates, not real-time or trading-grade rates.
+Use this skill for read-only currency conversion and exchange-rate lookup. It supports multiple free sources:
+
+- `auto` / `fast` (default): try `fxapi.app`, then `MoneyConvert`, then Frankfurter / ECB as fallback.
+- `fxapi`: no-key fast source, advertised 5-minute updates, direct pair endpoint.
+- `moneyconvert`: no-key fast fallback, advertised 5-minute updates, USD-based all-rates endpoint.
+- `ecb`: Frankfurter API backed by European Central Bank daily reference rates.
+
+All rates are informational reference rates, not trading-grade quotes.
 
 ## When to use
 Use this skill when the user wants:
 - 货币换算 / 汇率转换
-- 查询每日可用 ECB 参考汇率（非实时行情）
-- 将金额从一种币种换成另一种币种
-- 快速比较 USD、EUR、CNY、JPY、GBP、HKD 等常见币种
+- 查询美元人民币、欧元美元等常见币种汇率
+- 免费快速汇率（无 API key）
+- ECB / 欧洲央行每日官方参考汇率
+- 比较 USD、EUR、CNY、JPY、GBP、HKD 等常见币种
 
 ## Quick start
 Run commands from the skill root:
@@ -31,32 +39,45 @@ python3 scripts/convert.py 100 USD CNY
 
 ## Workflow
 1. Normalize currency codes to 3-letter uppercase codes such as `USD`, `EUR`, `CNY`, `JPY`, `GBP`, or `HKD`.
-2. Run `python3 scripts/convert.py <amount> <from_currency> <to_currency>` from the skill root.
-3. Report the source amount, converted amount, ECB rate date, and Frankfurter as the data source.
-4. Make clear that the rate is an ECB daily reference rate, not a real-time market quote.
-5. Mention that weekends and ECB holidays may return the latest prior business-day rate when date precision matters.
+2. Choose the source:
+   - Use default `auto` for a fast no-key answer.
+   - Use `--source ecb` when the user asks for official ECB / daily reference rates.
+   - Use `--source fxapi` or `--source moneyconvert` when testing a specific fast source.
+3. Run `python3 scripts/convert.py <amount> <from_currency> <to_currency> [--source SOURCE]` from the skill root.
+4. Report the converted amount, source, rate timestamp/date, and freshness note.
+5. Make clear that free fast sources are not trading-grade, and ECB is daily reference data rather than real-time market data.
 
 ## Commands
 ```bash
 # Install / permission check
 bash scripts/install.sh
 
-# Full health check with API smoke test
+# Full health check with API smoke tests
 bash scripts/check.sh
 
 # Skip network smoke test when offline or only validating local files
 RUN_SMOKE=0 bash scripts/check.sh
 
-# Convert currencies
+# Default: auto/fast source with fallback
 python3 scripts/convert.py 100 USD CNY
-python3 scripts/convert.py 1 EUR USD
+
+# Explicit fast no-key sources
+python3 scripts/convert.py 100 USD CNY --source fxapi
+python3 scripts/convert.py 100 USD CNY --source moneyconvert
+
+# Official daily reference source
+python3 scripts/convert.py 100 USD CNY --source ecb
+
+# Same-currency and zero-amount conversions are local
 python3 scripts/convert.py 100 USD USD
+python3 scripts/convert.py 0 EUR GBP
 ```
 
-## Notes
-- This skill is read-only and requires no API key.
-- It does not perform trading, payments, account access, or financial advice.
-- Frankfurter rates are ECB daily reference rates and update on ECB business days; they are not real-time or trading-grade market rates.
+## Source notes
+- `fxapi.app`: no API key, CORS-enabled JSON, advertised 5-minute updates. Good default for quick free lookups, but not a long-established institutional data provider.
+- `MoneyConvert`: no authentication, CDN JSON API, advertised 5-minute updates, attribution/terms apply. Good fallback for fast no-key lookup.
+- `Frankfurter / ECB`: no API key, official-style daily ECB reference data, strongest for accounting/reference context, but not real-time and covers fewer currencies.
 - Same-currency and zero-amount conversion are handled locally without an API request.
+- The skill does not perform trading, payments, account access, or financial advice.
 - If setup is missing or stale, re-run `bash scripts/install.sh`.
 - Keep detailed human-facing usage in `README.md`.
