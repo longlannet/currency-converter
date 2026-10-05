@@ -73,6 +73,10 @@ python3 scripts/convert.py 100 USD USD
 python3 scripts/convert.py 0 EUR GBP
 ```
 
+## Historical rates and charts
+
+For JPY history, define CNY per 100 JPY or USD/JPY (JPY per 1 USD) explicitly, state quote direction and latest available reference/business day, and distinguish reference rates from retail prices. Calculate conversions/changes in code and deliver an actually rendered, inspected chart when requested; disclose any visual-QA limitation. See [FX history and charting](references/fx-history-and-charting.md). This does not change the existing spot-source defaults.
+
 ## Source notes
 - `fxapi.app`: primary source for this skill. No API key, CORS-enabled JSON, advertised 5-minute updates. Good default for quick free lookups, but not a long-established institutional data provider.
 - `MoneyConvert`: no authentication, CDN JSON API, advertised 5-minute updates, attribution/terms apply. Good fallback for fast no-key lookup.
